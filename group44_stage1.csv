@@ -1,5 +1,5 @@
 index,real_news
-1,no!
+1,yes
 2,yes
 3,yes
 4,no
@@ -14,7 +14,7 @@ index,real_news
 13,no
 14,no
 15,no
-16,no!
+16,no?
 17,yes
 18,yes
 19,yes
@@ -39,16 +39,16 @@ index,real_news
 38,no
 39,yes
 40,yes
-41,yes - til here
+41,yes
 42,yes
 43,yes
-44,yes?
+44,yes
 45,no
 46,no
 47,no
 48,no
-49,yes?
-50,no?
+49,no?
+50,no
 51,yes
 52,yes
 53,no
@@ -58,7 +58,7 @@ index,real_news
 57,no
 58,yes
 59,yes
-60,yes?
+60,no
 61,no
 62,no
 63,no
@@ -66,8 +66,8 @@ index,real_news
 65,no
 66,no
 67,no
-68,no?
-69,no?
+68,no
+69,no
 70,yes
 71,yes
 72,no
