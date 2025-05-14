@@ -1,0 +1,72 @@
+{
+    "causes_of_climate_change": [
+        "Greenhouse gases (GHGs) such as CO\u2082, CH\u2084, and N\u2082O trap heat in the Earth\u2019s atmosphere.",
+        "Human activities like burning fossil fuels, deforestation, and industrial processes increase atmospheric GHG levels.",
+        "The Intergovernmental Panel on Climate Change (IPCC) attributes recent global warming primarily to anthropogenic emissions."
+    ],
+    "observed_effects": [
+        "Global average temperature has risen by approximately 1.1\u00b0C since pre-industrial times.",
+        "Ice sheets in Greenland and Antarctica are shrinking.",
+        "Sea levels are rising due to thermal expansion and melting glaciers.",
+        "Frequency and intensity of extreme weather events\u2014such as hurricanes, heatwaves, and wildfires\u2014have increased.",
+        "Ocean acidification is rising as more CO\u2082 is absorbed by oceans."
+    ],
+    "projected_impacts": [
+        "If current trends continue, the planet may warm by 2.7\u00b0C by 2100.",
+        "Warming beyond 1.5\u00b0C risks triggering tipping points, such as Amazon dieback and permafrost thaw.",
+        "Climate change will disproportionately impact low-income and coastal populations."
+    ],
+    "mitigation_strategies": [
+        "Rapid reduction in fossil fuel use and transition to renewable energy (solar, wind).",
+        "Reforestation and afforestation enhance carbon sequestration.",
+        "Electrification of transport reduces emissions from vehicles.",
+        "Implementation of carbon pricing and emissions trading schemes.",
+        "International agreements like the Paris Accord aim to keep warming below 2\u00b0C."
+    ],
+    "adaptation_measures": [
+        "Building flood defenses and early warning systems.",
+        "Shifting agricultural practices to drought-resilient crops.",
+        "Upgrading infrastructure to withstand extreme weather."
+    ],
+    "scientific_and_societal_response": [
+        "Climate models are used to simulate future scenarios under various emission pathways.",
+        "Misinformation about climate change undermines public understanding and policy support.",
+        "Education, media, and policy play critical roles in shaping climate action."
+    ],
+    "trusted_entities": {
+        "organizations": [
+            "IPCC",
+            "NASA",
+            "NOAA",
+            "UNFCCC",
+            "World Meteorological Organization",
+            "Berkeley Earth",
+            "World Weather Attribution",
+            "University of Exeter",
+            "University of California, Berkeley",
+            "Geophysical Research Letters"
+        ],
+        "scientists": [
+            "James Hansen",
+            "Gavin Schmidt",
+            "Zeke Hausfather",
+            "Philippe Ciais",
+            "Stephen Sitch",
+            "Anthony Walker",
+            "Trevor Keenan",
+            "Gretta Pecl",
+            "Peter Cox",
+            "Celeste Saulo",
+            "Vanessa Nakate",
+            "Nils-Axel M\u00f6rner",
+            "Mototaka Nakamura",
+            "Marc Morano",
+            "Dipak Dasgupta"
+        ],
+        "datasets": [
+            "NASA GISS",
+            "UK-HADLEY Centre",
+            "World Glacier Monitoring Service"
+        ]
+    }
+}
