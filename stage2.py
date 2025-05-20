@@ -15,7 +15,7 @@ def semantic_fact_match_score(article_sentences):
 
     cos_sim = util.pytorch_cos_sim(article_embeddings, kb_embeddings)
 
-    match_count = (cos_sim > 0.75).any(dim=1).sum().item()
+    match_count = (cos_sim > 0.6).any(dim=1).sum().item()
     return match_count
 
 
@@ -29,17 +29,6 @@ def count_trusted_entities(text, kb_entities):
             if ent.text in kb_entities["organizations"] or ent.text in kb_entities["scientists"]:
                 trusted += 1
     return trusted, total
-
-
-def fact_match_score(article_sentences, kb_facts):
-    matches = 0
-    for sent in article_sentences:
-        for fact in kb_facts:
-            ratio = SequenceMatcher(None, sent.lower(), fact.lower()).ratio()
-            if ratio > 0.8:  
-                matches += 1
-                break
-    return matches
 
 
 def count_errors(text, tool):
@@ -60,6 +49,24 @@ def get_readability(text):
         "words_per_sentence": textstat.words_per_sentence(text),
         "difficult_words": textstat.difficult_words(text)
     }
+
+
+def pos_distribution(text):
+    doc = nlp(text)
+    pos_counts = {
+        "NOUN": 0,
+        "VERB": 0,
+        "ADJ": 0,
+        "ADV": 0
+    }
+    for token in doc:
+        if token.pos_ in pos_counts:
+            pos_counts[token.pos_] += 1
+    return pos_counts
+
+
+def count_red_flags(text):
+    return sum(text.lower().count(word) for word in suspicious_keywords)
 #######################################################
 
 # read in
@@ -69,13 +76,15 @@ with open(file_path, 'r') as file:
     data = [json.loads(line) for line in file]
 df = pd.DataFrame(data)
 
+df2 = df.copy()
+# tolower for the text checker
+df2['Title'] = df2['Title'].str.lower()
+df2['Text'] = df2['Text'].str.lower()
+
 file_path = 'knowledge_base.jsonl'
 with open(file_path, 'r') as f:
     df_kb = json.load(f)
 
-# preprocessing (destroys the accuracy of spelling error check)
-# df['Title'] = df['Title'].str.lower()
-# df['Text'] = df['Text'].str.lower()
 
 # spelling errors
 tool = language_tool_python.LanguageTool('en-US')
@@ -106,25 +115,26 @@ df['EntityRatio'] = entity_ratios
 
 # check facts of the knowledge base
 # TODO: not really working yet!!
-# model = SentenceTransformer('all-MiniLM-L6-v2')
-# kb_facts = df_kb["causes_of_climate_change"] + df_kb["observed_effects"] + df_kb["projected_impacts"]
-# kb_embeddings = model.encode(kb_facts, convert_to_tensor=True)
+model = SentenceTransformer('all-MiniLM-L6-v2')
+kb_facts = df_kb["facts"] + df_kb["scientific_data"] + df_kb["prevention"]
+kb_embeddings = model.encode(kb_facts, convert_to_tensor=True)
 
 # nlp = spacy.load("en_core_web_sm")
-# semantic_match_counts = []
-# fact_match_counts = []
+semantic_match_counts = []
+fact_match_counts = []
 
-# for i in range(len(df)):
-#     doc = nlp(df['Text'].iloc[i])
-#     article_sentences = [sent.text for sent in doc.sents]
-#     fact_match_count_semantic = semantic_fact_match_score(article_sentences)
-#     semantic_match_counts.append(fact_match_count_semantic)
-#     fact_match_count = fact_match_score(article_sentences, df_kb["causes_of_climate_change"] + df_kb["observed_effects"])
-#     fact_match_counts.append(fact_match_count)
+for i in range(len(df)):
+    doc = nlp(df['Text'].iloc[i])
+    article_sentences = [sent.text for sent in doc.sents]
+    fact_match_count_semantic = semantic_fact_match_score(article_sentences)
+    semantic_match_counts.append(fact_match_count_semantic)
 
-# df['SemanticFactMatchCount'] = semantic_match_counts
-# df['FactMatchCount'] = fact_match_counts
+df['SemanticFactMatchCount'] = semantic_match_counts
 
+
+# POS Tagging
+pos_df = df['Text'].apply(pos_distribution).apply(pd.Series)
+df = pd.concat([df, pos_df], axis=1)
 
 
 # readability
@@ -132,15 +142,9 @@ readability_df = df['Text'].apply(get_readability).apply(pd.Series)
 df = pd.concat([df, readability_df], axis=1)
 
 
-
 # redflagwords
 suspicious_keywords = ["hoax", "exposed", "globalist", "scam", "shocking", "hidden", "fake", "alarmist", "agenda"]
-
-def count_red_flags(text):
-    return sum(text.lower().count(word) for word in suspicious_keywords)
-
 df['RedFlagWords'] = df['Text'].apply(count_red_flags)
-
 
 
 # output
@@ -149,7 +153,3 @@ output_file_path = 'test_output.jsonl'
 with open(output_file_path, 'w') as output_file:
     for record in df.to_dict(orient='records'):
         output_file.write(json.dumps(record) + '\n')
-
-
-    
-
