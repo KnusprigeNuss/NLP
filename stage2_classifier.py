@@ -5,6 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
+from sklearn.feature_selection import SelectFromModel
 
 
 # read in
@@ -25,13 +26,18 @@ emotions_df = df['EmotionScores'].apply(pd.Series).fillna(0)
 df = pd.concat([df, emotions_df], axis=1)
 df = df.drop(columns=['EmotionScores', 'Index', 'joy'])#,"SemanticFactMatchCount-50",'SemanticFactMatchCount-75','SemanticFactMatchCount-85','SemanticFactMatchCount-80',"SemanticFactMatchCount-70","SemanticFactMatchCount-60",'SemanticFactMatchCount-90',"SemanticFactMatchCount-55","SemanticFactMatchCount-65"])
 
-
-X = df.drop(columns=['Label'])
+#use the features found by featuresearch.py
+features =  [
+    'TotalEntities', 'SemanticFactMatchCount-55', 'NOUN', 'VERB', 'ADJ', 'ADV',
+    'flesch_reading_ease', 'smog_index', 'automated_readability_index', 'words_per_sentence',
+    'difficult_words', 'RedFlagWords', 'fear', 'negative', 'positive', 'sadness'
+]
+X = df[features]
 y = df['Label']   
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
-X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=342)
-
+X_train, X_test, y_train, y_test = train_test_split(
+    X_scaled, y, test_size=0.2, random_state=342)
 
 # random forest
 param_grid = {
@@ -47,7 +53,7 @@ param_grid = {
 #print("Accuracy:", accuracy_score(y_test, y_pred))
 
 
-clf = RandomForestClassifier(n_estimators=100, random_state=42, min_samples_split=5, min_samples_leaf=1, max_depth=None)
+clf = RandomForestClassifier(n_estimators=100, random_state=42232, min_samples_split=5, min_samples_leaf=1, max_depth=None)
 clf.fit(X_train, y_train)
 y_pred = clf.predict(X_test)
 
@@ -83,4 +89,5 @@ output_df = pd.DataFrame({
     "real_news": ["yes" if pred == 1 else "no" for pred in y_pred]
 })
 output_df.to_csv("group44_stage2_mr.csv", index=False)
+
 

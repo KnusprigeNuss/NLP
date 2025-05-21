@@ -144,7 +144,9 @@ df['EntityRatio'] = entity_ratios
 
 # check facts of the knowledge base
 # TODO: not really working yet!!
-model = SentenceTransformer('all-MiniLM-L6-v2')
+#model = SentenceTransformer('all-MiniLM-L6-v2')
+#This works better
+model = SentenceTransformer('msmarco-distilbert-base-v4')
 kb_facts = df_kb["facts"] + df_kb["scientific_data"] + df_kb["prevention"]+df_kb["support"]
 kb_embeddings = model.encode(kb_facts, convert_to_tensor=True)
 
