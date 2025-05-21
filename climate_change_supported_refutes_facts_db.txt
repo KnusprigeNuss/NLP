@@ -1,29 +1,5 @@
 {
-    "facts": [
-        "Greenhouse gases such as CO₂, CH₄, and N₂O trap heat in the Earth's atmosphere.",
-        "Human activities like burning fossil fuels and industrial processes increase greenhouse gas emissions.",
-        "If current trends continue, the planet is projected to warm by 2.7°C by the year 2100.",
-        "Climate change is primarily driven by human activities."
-    ],
-    "scientific_data": [
-        "The global average temperature has been steadily increasing.",
-        "Ice sheets in Greenland and Antarctica are shrinking due to warming.",
-        "Extreme weather events like hurricanes, heatwaves, and wildfires have become more frequent and intense.",
-        "Sea levels are rising as a result of melting glaciers and thermal expansion.",
-        "Atmospheric concentrations of CO₂ are increasing over time.",
-        "Glaciers around the world are retreating.",
-        "Scientists use the concept of a carbon budget to track remaining emissions limits.",
-        "Ocean acidification is increasing due to more CO₂ being absorbed by seawater."
-    ],
-    "prevention": [
-        "A rapid reduction in fossil fuel use is necessary to combat climate change.",
-        "Transitioning to renewable energy sources like wind and solar can reduce carbon emissions.",
-        "Reforestation and afforestation help absorb CO₂ from the atmosphere.",
-        "Electrifying transport systems can help reduce greenhouse gas emissions from vehicles.",
-        "Implementing carbon pricing policies can incentivize lower emissions.",
-        "Emissions trading schemes can be used to limit overall greenhouse gas output."
-    ],
-     "support": [
+  "support": [
     "The amount of gas and ash emitted by volcanic eruptions has a significant effect on the Earth's climate.",
     "The current Arctic warming is leading to ancient carbon being released from thawing permafrost, leading to methane and carbon dioxide production by micro-organisms.",
     "According to the WWF, the combination of climate change and deforestation increases the drying effect of dead trees that fuels forest fires.",
@@ -2008,38 +1984,5 @@
     "White House explains the link between Climate Change and Wild Fires.",
     "However, Greg Holland from the National Center for Atmospheric Research, who reviewed the study, noted: “There is no doubt that the sea level rise, within the IPCC, is a very conservative number, so the truth lies somewhere between IPCC and Jim.” In addition, one 2017 study's scenario, assuming high fossil fuel use for combustion and strong economic growth during this century, projects sea level rise of up to 132 cm (4.3 ft) on average — and an extreme scenario with as much as 189 cm (6.2 ft), by 2100.",
     "During the winter it is very cold and dark, with the average temperature around −28 °C (−18 °F), sometimes dipping as low as −50 °C (−58 °F)."
-  ],
-    "trusted_entities": {
-        "organizations": [
-            "IPCC",
-            "NASA",
-            "NOAA",
-            "UNFCCC",
-            "World Meteorological Organization",
-            "WMO",
-            "WWF",
-            "Greenpeace",
-            "Climate Action Network",
-            "Berkeley Earth",
-            "World Weather Attribution",
-            "University of Exeter",
-            "University of California",
-            "Geophysical Research Letters",
-            "World Glacier Monitoring Service"
-        ],
-        "scientists": [
-            "James Hansen",
-            "Gavin Schmidt",
-            "Zeke Hausfather",
-            "Philippe Ciais",
-            "Stephen Sitch",
-            "Anthony Walker",
-            "Trevor Keenan",
-            "Gretta Pecl",
-            "Peter Cox",
-            "Celeste Saulo",
-            "Vanessa Nakate",
-            "Dipak Dasgupta"
-        ]
-    }
+  ]
 }
