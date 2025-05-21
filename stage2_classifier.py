@@ -6,6 +6,7 @@ from sklearn.metrics import accuracy_score, classification_report
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import SelectFromModel
+from sklearn.model_selection import cross_val_score
 
 
 # read in
@@ -37,7 +38,7 @@ y = df['Label']
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 X_train, X_test, y_train, y_test = train_test_split(
-    X_scaled, y, test_size=0.2, random_state=342)
+    X_scaled, y, test_size=0.2, random_state=232)
 
 # random forest
 param_grid = {
@@ -52,9 +53,15 @@ param_grid = {
 #print("Best parameters:", grid.best_params_)
 #print("Accuracy:", accuracy_score(y_test, y_pred))
 
-
-clf = RandomForestClassifier(n_estimators=100, random_state=42232, min_samples_split=5, min_samples_leaf=1, max_depth=None)
+#beacuse of overfitting introduce limitations like max_depth
+clf = RandomForestClassifier(
+    n_estimators=100,
+    random_state=42,
+    max_depth=15,
+    min_samples_split=23,
+    min_samples_leaf=8)
 clf.fit(X_train, y_train)
+y_train_pred = clf.predict(X_train)
 y_pred = clf.predict(X_test)
 
 
@@ -82,8 +89,13 @@ importance_df = pd.DataFrame({
 # Show top features
 print(importance_df)
 
-# output 
-print(accuracy_score(y_test, y_pred))
+# output
+print("train:", accuracy_score(y_train, y_train_pred))
+print("test:",accuracy_score(y_test, y_pred))
+#cross val because of overfitting problems
+scores = cross_val_score(clf, X_scaled, y, cv=5)
+print("CV scores:", scores)
+print("Mean CV accuracy:", scores.mean())
 output_df = pd.DataFrame({
     "index": range(1, len(y_pred) + 1),
     "real_news": ["yes" if pred == 1 else "no" for pred in y_pred]
