@@ -283,6 +283,7 @@ def label_data(feature_src):
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
+    #TODO label all 150 files
 def main():
     feature_extraction = False
     find_best_features = True
