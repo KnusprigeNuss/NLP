@@ -19,9 +19,8 @@ import textstat
     return match_count
 """
 
-thresholds_to_test = [0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90]
 
-def semantic_fact_match_score(article_sentences, thresholds):
+def semantic_fact_match_score(article_sentences, thresholds=[0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90]):
     """
     Calculates semantic fact match counts for a list of article sentences
     against the knowledge base embeddings for multiple cosine similarity thresholds,
@@ -34,9 +33,6 @@ def semantic_fact_match_score(article_sentences, thresholds):
     Returns:
         list: A list of match counts, ordered according to the `thresholds` input.
     """
-    if not article_sentences:
-        return [0] * len(thresholds) # Return a list of zeros if no sentences
-
     article_embeddings = model.encode(article_sentences, convert_to_tensor=True)
     cos_sim = util.pytorch_cos_sim(article_embeddings, kb_embeddings)
 
@@ -144,7 +140,7 @@ df['EntityRatio'] = entity_ratios
 
 # check facts of the knowledge base
 # TODO: not really working yet!!
-#model = SentenceTransformer('all-MiniLM-L6-v2')
+
 #This works better
 model = SentenceTransformer('msmarco-distilbert-base-v4')
 kb_facts = df_kb["facts"] + df_kb["scientific_data"] + df_kb["prevention"]+df_kb["support"]
@@ -165,7 +161,7 @@ fact_match_counts = []
 for i in range(len(df)):
     doc = nlp(df['Text'].iloc[i])
     article_sentences = [sent.text for sent in doc.sents]
-    match_count50,match_count55,match_count60,match_count65,match_count70,match_count75,match_count80,match_count85,match_count90 = semantic_fact_match_score(article_sentences,thresholds=thresholds_to_test)
+    match_count50,match_count55,match_count60,match_count65,match_count70,match_count75,match_count80,match_count85,match_count90 = semantic_fact_match_score(article_sentences)
     semantic_match_counts_50.append(match_count50)
     semantic_match_counts_55.append(match_count55)
     semantic_match_counts_60.append(match_count60)
@@ -196,15 +192,15 @@ df = pd.concat([df, pos_df], axis=1)
 readability_df = df['Text'].apply(get_readability).apply(pd.Series)
 df = pd.concat([df, readability_df], axis=1)
 
-
+suspicious_keywords = ["hoax", "exposed", "globalist", "scam", "shocking", "hidden", "fake", "alarmist",
+                       "agenda"]
 # redflagwords
-suspicious_keywords = ["hoax", "exposed", "globalist", "scam", "shocking", "hidden", "fake", "alarmist", "agenda"]
 df['RedFlagWords'] = df['Text'].apply(count_red_flags)
 
 
 # output
 df = df.drop(columns=['Text', 'Title'])
-output_file_path = 'test_output_mr_msmarco-distilbert-base-v4.jsonl'
+output_file_path = 'test_output_mr_msmarco-distilbert-base-v4-TEST.jsonl'
 with open(output_file_path, 'w') as output_file:
     for record in df.to_dict(orient='records'):
         output_file.write(json.dumps(record) + '\n')
