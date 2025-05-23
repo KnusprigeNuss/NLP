@@ -10,10 +10,11 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import RFECV
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-
+from xgboost import XGBClassifier
+from catboost import CatBoostClassifier
 
 def feature_extraction_dataset(src_path, dest_path):
     def count_trusted_entities(text):
@@ -187,7 +188,9 @@ def feature_extraction_dataset(src_path, dest_path):
             output_file.write(json.dumps(record) + '\n')
 
 
-def find_best_features_forest(feature_src):
+
+
+def find_best_features_model(feature_src):
     with open(feature_src, 'r') as file:
         data = [json.loads(line) for line in file]
     df = pd.DataFrame(data)
@@ -256,50 +259,116 @@ def find_best_features_forest(feature_src):
     print("Random Forest accuracy:", accuracy_score(y_test, y_pred))
     print("Optimal number of features:", rfecv_rf.n_features_)
     print("Selected features:", list(selected_features))
+    # XGBoost
+    xgb = XGBClassifier( eval_metric='logloss', random_state=42)
+    rfecv_xgb = RFECV(estimator=xgb, step=1, cv=StratifiedKFold(5), scoring='accuracy')
+    rfecv_xgb.fit(X_train_scaled, y_train)
+    X_train_rfe = rfecv_xgb.transform(X_train_scaled)
+    X_test_rfe = rfecv_xgb.transform(X_test_scaled)
+    clf_xgb = XGBClassifier( eval_metric='logloss', random_state=42)
+    clf_xgb.fit(X_train_rfe, y_train)
+    y_pred = clf_xgb.predict(X_test_rfe)
+    selected_features = X.columns[rfecv_xgb.support_]
+    print("XGBoost Accuracy:", accuracy_score(y_test, y_pred))
+    print("Optimal number of features:", rfecv_xgb.n_features_)
+    print("Selected features:", list(selected_features))
 
-def label_data(feature_src):
-    #from find_best_feature_forest()
-    selected_features=['Grammar_errors', 'TotalEntities', 'SemanticFactMatchCount-50', 'SemanticFactMatchCount-55', 'SemanticFactMatchCount-60', 'NOUN', 'VERB', 'ADJ', 'ADV', 'flesch_reading_ease', 'smog_index', 'automated_readability_index', 'words_per_sentence', 'difficult_words', 'RedFlagWords', 'anticipation', 'fear', 'negative', 'positive', 'anger', 'trust', 'sadness']
+    # CatBoost
+    catboost_model = CatBoostClassifier(
+    learning_rate=0.1,
+    max_depth=2,
+    n_estimators=50,
+    reg_lambda=0.25,
+    subsample=0.05,
+    verbose=0,
+    random_state=42
+    )
+    catboost_model.fit(X_train_scaled, y_train)
+    y_pred = catboost_model.predict(X_test_scaled)
+    print("CatBoost accuracy:", accuracy_score(y_test, y_pred))
+
+
+def train_model(feature_src):
+    # from find_best_feature_forest()
+    selected_features = ['Grammar_errors', 'TotalEntities', 'SemanticFactMatchCount-50', 'SemanticFactMatchCount-55',
+                         'SemanticFactMatchCount-60', 'NOUN', 'VERB', 'ADJ', 'ADV', 'flesch_reading_ease', 'smog_index',
+                         'automated_readability_index', 'words_per_sentence', 'difficult_words', 'RedFlagWords',
+                         'anticipation', 'fear', 'negative', 'positive', 'anger', 'trust', 'sadness']
     with open(feature_src, 'r') as file:
         data = [json.loads(line) for line in file]
     df = pd.DataFrame(data)
-    #our self labeled gournd truth
+    # our self labeled gournd truth
     df['Label'] = [1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1,
                    1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
                    1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1,
                    1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1,
                    1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1,
                    0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0]
-    #just preprocessing - EmotionScores is in an other format
+    # just preprocessing - EmotionScores is in an other format
     emotions_df = df['EmotionScores'].apply(pd.Series).fillna(0)
     df = pd.concat([df, emotions_df], axis=1)
-    df = df.drop(columns=['EmotionScores', 'Index','joy'])
-
+    df = df.drop(columns=['EmotionScores', 'Index', 'joy'])
+    #only use the selected features
     X = df[selected_features]
     y = df['Label']
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
     scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
-    #TODO label all 150 files
+    X_scaled = scaler.fit_transform(X)
+    #split into test/train - stratify to ensure 50/50 split of true/false
+    X_train, X_test, y_train, y_test = train_test_split(
+        X_scaled, y, test_size=0.3, random_state=654, stratify=y)
+    #best found hyperparameters (trial and error)
+    clf = RandomForestClassifier(
+        n_estimators=90,
+        random_state=420,
+        max_depth=60,
+        min_samples_split=18,
+    )
+    clf.fit(X_train, y_train)
+    y_train_pred = clf.predict(X_train)
+    y_pred = clf.predict(X_test)
+    importances = clf.feature_importances_
+    features = X.columns
+    #print the feature importance
+    importance_df = pd.DataFrame({
+        'Feature': features,
+        'Importance': importances
+    }).sort_values(by='Importance', ascending=False)
+    print(importance_df)
+    #Train and test accuarcy
+    print("\n-------------Train/Test and CV accuracy-----------\n")
+    print("train:", accuracy_score(y_train, y_train_pred))
+    print("test:", accuracy_score(y_test, y_pred))
+    #cross val to ensure stability
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    scores = cross_val_score(clf, X_scaled, y, cv=cv)
+    print("CV scores:", scores)
+    print("Mean CV accuracy:", scores.mean())
+    print("\n-------------Label the dataset based on the trained model-----------\n")
+    full_dataset_pred = clf.predict(X_scaled)
+    print("Full dataset accuracy:", accuracy_score(df['Label'], full_dataset_pred))
+    output_df = pd.DataFrame({
+        "index": range(1, len(full_dataset_pred) + 1),
+        "real_news": ["yes" if pred == 1 else "no" for pred in full_dataset_pred]
+    })
+    output_df.to_csv("data/group44_stage2.csv", index=False)
+
 def main():
     feature_extraction = False
-    find_best_features = True
-    training = False
+    find_best_model = False
+    label_data = True
     src_path = 'data/without_assessment.jsonl'
-    dest_path = 'test_output_mr_msmarco-distilbert-base-v4.jsonl'
+    dest_path = 'data/features_extracted.jsonl'
     print("***************NLP Stage 2***************")
     if feature_extraction:
         print("#####################Feature Extraction#####################")
         feature_extraction_dataset(src_path, dest_path)
-    if find_best_features:
-        print("#####################Find best features#####################")
-        find_best_features_forest(dest_path)
-        #TODO include hyperparam search for random forest
+    if find_best_model:
+        print("#####################Find best model#####################")
+        find_best_features_model(dest_path)
     if label_data:
-        label_data(dest_path)
+        print("#####################Train model: RandomForest and label the dataset######")
+        train_model(dest_path)
+    #TODO include the knowlagebase extraction (knowlage_base_facts.py)
 
 
 

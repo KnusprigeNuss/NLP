@@ -1,12 +1,14 @@
 import json
 import pandas as pd
+from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import SelectFromModel
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import StratifiedKFold, cross_val_score
+from catboost import CatBoostClassifier
 
 
 # read in
@@ -28,17 +30,14 @@ df = pd.concat([df, emotions_df], axis=1)
 df = df.drop(columns=['EmotionScores', 'Index', 'joy'])#,"SemanticFactMatchCount-50",'SemanticFactMatchCount-75','SemanticFactMatchCount-85','SemanticFactMatchCount-80',"SemanticFactMatchCount-70","SemanticFactMatchCount-60",'SemanticFactMatchCount-90',"SemanticFactMatchCount-55","SemanticFactMatchCount-65"])
 
 #use the features found by featuresearch.py
-features =  [
-    'TotalEntities', 'SemanticFactMatchCount-55', 'NOUN', 'VERB', 'ADJ', 'ADV',
-    'flesch_reading_ease', 'smog_index', 'automated_readability_index', 'words_per_sentence',
-    'difficult_words', 'RedFlagWords', 'fear', 'negative', 'positive', 'sadness'
-]
+features=['Grammar_errors', 'TotalEntities', 'SemanticFactMatchCount-50', 'SemanticFactMatchCount-55', 'SemanticFactMatchCount-60', 'NOUN', 'VERB', 'ADJ', 'ADV', 'flesch_reading_ease', 'smog_index', 'automated_readability_index', 'words_per_sentence', 'difficult_words', 'RedFlagWords', 'anticipation', 'fear', 'negative', 'positive', 'anger', 'trust', 'sadness']
+
 X = df[features]
 y = df['Label']   
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 X_train, X_test, y_train, y_test = train_test_split(
-    X_scaled, y, test_size=0.2, random_state=232)
+    X_scaled, y, test_size=0.3, random_state=654,stratify=y)
 
 # random forest
 param_grid = {
@@ -55,11 +54,12 @@ param_grid = {
 
 #beacuse of overfitting introduce limitations like max_depth
 clf = RandomForestClassifier(
-    n_estimators=100,
-    random_state=42,
-    max_depth=15,
-    min_samples_split=23,
-    min_samples_leaf=8)
+    n_estimators=90,
+    random_state=420,
+    max_depth=60,
+    min_samples_split=18,
+ )
+
 clf.fit(X_train, y_train)
 y_train_pred = clf.predict(X_train)
 y_pred = clf.predict(X_test)
@@ -67,9 +67,9 @@ y_pred = clf.predict(X_test)
 
 # logistic regression (worse)
 # param_grid = {
-#     'C': [0.01, 0.05, 0.1, 0.5, 1, 5, 10, 50],             
-#     'penalty': ['l2'],                          
-#     'solver': ['lbfgs', 'saga'],                
+#     'C': [0.01, 0.05, 0.1, 0.5, 1, 5, 10, 50],
+#     'penalty': ['l2'],
+#     'solver': ['lbfgs', 'saga'],
 #     'max_iter': [1000, 5000, 10000]
 # }
 # grid = GridSearchCV(LogisticRegression(), param_grid, cv=5, n_jobs=-1)
@@ -93,7 +93,8 @@ print(importance_df)
 print("train:", accuracy_score(y_train, y_train_pred))
 print("test:",accuracy_score(y_test, y_pred))
 #cross val because of overfitting problems
-scores = cross_val_score(clf, X_scaled, y, cv=5)
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+scores = cross_val_score(clf, X_scaled, y, cv=cv)
 print("CV scores:", scores)
 print("Mean CV accuracy:", scores.mean())
 output_df = pd.DataFrame({
