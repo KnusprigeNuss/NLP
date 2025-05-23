@@ -315,7 +315,7 @@ def train_model(feature_src):
     X_scaled = scaler.fit_transform(X)
     #split into test/train - stratify to ensure 50/50 split of true/false
     X_train, X_test, y_train, y_test = train_test_split(
-        X_scaled, y, test_size=0.3, random_state=654, stratify=y)
+        X_scaled, y, test_size=0.2, random_state=654, stratify=y)
     #best found hyperparameters (trial and error)
     clf = RandomForestClassifier(
         n_estimators=90,

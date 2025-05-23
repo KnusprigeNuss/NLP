@@ -2,7 +2,7 @@ index,real_news
 1,yes
 2,yes
 3,no
-4,no
+4,yes
 5,no
 6,yes
 7,yes
@@ -22,7 +22,7 @@ index,real_news
 21,yes
 22,no
 23,yes
-24,yes
+24,no
 25,yes
 26,no
 27,no
@@ -38,12 +38,12 @@ index,real_news
 37,no
 38,no
 39,yes
-40,no
+40,yes
 41,yes
 42,yes
 43,yes
 44,yes
-45,yes
+45,no
 46,no
 47,no
 48,no
@@ -58,7 +58,7 @@ index,real_news
 57,no
 58,yes
 59,yes
-60,yes
+60,no
 61,no
 62,no
 63,no
@@ -74,7 +74,7 @@ index,real_news
 73,no
 74,yes
 75,yes
-76,no
+76,yes
 77,yes
 78,yes
 79,no
@@ -90,9 +90,9 @@ index,real_news
 89,yes
 90,no
 91,yes
-92,no
+92,yes
 93,yes
-94,no
+94,yes
 95,yes
 96,no
 97,no
@@ -108,7 +108,7 @@ index,real_news
 107,yes
 108,yes
 109,yes
-110,no
+110,yes
 111,yes
 112,yes
 113,yes
@@ -118,7 +118,7 @@ index,real_news
 117,yes
 118,yes
 119,yes
-120,yes
+120,no
 121,no
 122,yes
 123,yes
