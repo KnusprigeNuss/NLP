@@ -1,8 +1,5 @@
 # NLP
 
-lesen macht spaß yibbi
-
-
 installs:
 pip install language-tool-python
 pip install nrclex
