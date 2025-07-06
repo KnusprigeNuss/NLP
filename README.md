@@ -1,9 +1,3 @@
 # NLP
 
-installs:
-pip install language-tool-python
-pip install nrclex
-pip install spacy
-pip install textstat
-pip install sentence-transformers
-python3 -m textblob.download_corpora
+Misinformation about climate change is a growing problem that affects how the public understands the issue and how policies are made. It was discovered that most population groups have problems with determining if a certain text is real or misinformation. In this study, we explore how well different Natural Language Processing (NLP) methods can detect misinformation in climate-related articles. We compare three main approaches with increasing complexity with the first being a simple manual classification to get a feeling for important factors of correctly classifying such articles. The second approach is a traditional NLP pipeline using features like Part-of-speech-tagging (POS-tagging), named entity recognition, readibility scores and other metrics. Lastly, we have a modern Retrieval-Augmented Generation (RAG) system which combines a Large Language Model (LLM) with a fact-based knowledge base and a FAISS-powered search engine. We assess each method in terms of how well it performs, how easy it is to understand, and what limitations it has. Our results show that both the traditional NLP approach and the RAG approach work pretty well for this task. While LLMs can be very accurate, they also face issues like unclear responses and limits on how much text they can process. The traditional NLP approach on the other hand struggled with context and semantics at time, for example falsely flagging sarcasm.
