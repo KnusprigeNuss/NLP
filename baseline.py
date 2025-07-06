@@ -69,6 +69,7 @@ vectorizer = TfidfVectorizer(
     stop_words=None,
     max_df=0.8,
     min_df=0.005,
+    max_features=10,
     ngram_range=(1, 2),
 )
 X_train_tfidf = vectorizer.fit_transform(X_train['Text'])
