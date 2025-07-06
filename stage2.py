@@ -350,14 +350,14 @@ def train_model(feature_src):
         "index": range(1, len(full_dataset_pred) + 1),
         "real_news": ["yes" if pred == 1 else "no" for pred in full_dataset_pred]
     })
-    output_df.to_csv("data/group44_stage2.csv", index=False)
+    output_df.to_csv("data_stag2/group44_stage2.csv", index=False)
 
 def main():
     feature_extraction = False
     find_best_model = False
     label_data = True
-    src_path = 'data/without_assessment.jsonl'
-    dest_path = 'data/features_extracted.jsonl'
+    src_path = 'data_stag2/without_assessment.jsonl'
+    dest_path = 'data_stag2/features_extracted.jsonl'
     print("***************NLP Stage 2***************")
     if feature_extraction:
         print("#####################Feature Extraction#####################")
